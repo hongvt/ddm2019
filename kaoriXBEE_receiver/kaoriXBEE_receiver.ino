@@ -1,32 +1,34 @@
 
-//#include <SoftwareSerial.h> //for setting pins 2 and 3 on the arduino to act as TX and RX
-#include <XBee.h>
+#include <SoftwareSerial.h> //for setting pins 2 and 3 on the arduino to act as TX and RX
+//#include <XBee.h>
 //#define XBee Serial
-//SoftwareSerial XBee (2,3);
+SoftwareSerial xbeeSerial(2,3);
 
 
-XBee xbee = XBee();
-XBeeResponse response = XBeeResponse();
+//XBee xbee = XBee();
+//XBeeResponse response = XBeeResponse();
 // create reusable response objects for responses we expect to handle 
-Rx16Response rx16 = Rx16Response();
-Rx64Response rx64 = Rx64Response();
+//Rx16Response rx16 = Rx16Response();
+//Rx64Response rx64 = Rx64Response();
 
-uint8_t option = 0;
-uint8_t data = 0;
+//uint8_t option = 0;
+//uint8_t data = 0;
 
 //int data=0;
+int8_t data = 0;
 int led=7;
 
 void setup() {
   Serial.begin(115200); //this baud rate must match that of the configured xbee
-  xbee.setSerial(Serial);
-  //XBee.begin(115200);
+  //xbee.setSerial(Serial);
+  xbeeSerial.begin(115200);
   pinMode(led,OUTPUT);
 
 }
 
 void loop() {
-  xbee.readPacket();
+  //Serial.println("cereal is yum");
+  /*xbee.readPacket();
 
   if (xbee.getResponse().isAvailable()) {
   
@@ -43,16 +45,21 @@ void loop() {
             data = rx64.getData(0);
           }
     }
-  }
-  /*while(XBee.available()) { //check to see if XBee is receiving
-    data=XBee.read();
-    if (data==0x80) {
+  }*/
+  if(xbeeSerial.available()) { //check to see if XBee is receiving
+    data=xbeeSerial.read();
+    if (data>=1) {
       digitalWrite(led,HIGH);
+      Serial.println("high");
+      //Serial.println(data);
+     }
+    
+    if (data<=0){
+      digitalWrite(led,LOW);
+      Serial.println("low");
+      //Serial.println(data);
     }
     
-    if (data==0x01){
-      digitalWrite(led,LOW);
-    }
-    Serial.print(data);
-  }*/
+    //Serial.println("whatsup");
+  }
 }
