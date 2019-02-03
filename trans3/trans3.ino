@@ -17,10 +17,10 @@ SoftwareSerial xbeeSerial(2,3); //RX, TX)
 //XBee xbeeT = XBee(); //TX3, RX2 defining more serial ports arduino??
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   //XBee.begin(115200);
   //xbeeT.setSerial(xbeeSerial);
-  xbeeSerial.begin(115200);
+  xbeeSerial.begin(9600);
   pinMode(Lswitch, INPUT_PULLUP);
 
 }

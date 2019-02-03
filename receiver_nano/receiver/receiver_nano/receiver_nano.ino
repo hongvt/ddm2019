@@ -13,6 +13,8 @@ void setup() {
 }
 
 void loop() {
+  Serial.println("r u working my friend");
+  Serial.println(Serial.available());
    if(Serial.available()) { //check to see if XBee is receiving, if redefining pins, would be xbeeSerial.available()
     data=Serial.read(); //xbeeSerial.read()
     if (data>=1) {
