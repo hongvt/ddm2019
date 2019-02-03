@@ -10,8 +10,12 @@ int LPWM=6;// for hbridge
 int Lswitch=2; // limit switch
 int LS_state=0; // tracks limit switch state value: high/low as it is being read
 
-int8_t data = 0; //8 bit value, form of xbee message packets
+//int8_t data = 0; //8 bit value, form of xbee message packets //LIMIT SWITCH
 int numOfLoops = 0;
+
+//easy button
+int numOfZeros = 0;
+int eButtonXBEE = 0;
 
 void setup() 
 {
@@ -23,7 +27,8 @@ void setup()
   pinMode(LPWM, OUTPUT);
 
   pinMode(Lswitch,INPUT_PULLUP);
-
+  //pinMode(pwm1, INPUT);
+  
   Serial.begin(9600);
  }
 
@@ -33,23 +38,61 @@ void loop() {
     digitalWrite(L_en, HIGH);
     ch8=pulseIn(receiverCh8,HIGH,25000);
     //Serial.println(ch8);
+
     LS_state=digitalRead(Lswitch); //limit switch
     //Serial.println(LS_state);
-    
-    data=Serial.read(); //xbeeSerial.read()
+
+    //LIMIT SWITCH FROM XBEE
+    /*data=Serial.read(); //xbeeSerial.read()
     if (data>=1) {
-      
-       //while (numOfLoops < 100)
-        //{
-          digitalWrite(RPWM, LOW); 
-          digitalWrite(LPWM, HIGH);
-          //delay(5000);
-          //digitalWrite(RPWM, LOW); 
-          //digitalWrite(LPWM, LOW);
-          //numOfLoops++;
-        //}
+        numOfLoops++;
+    }*/
+
+//100 loops == less than 1 sec
+//500 loops == 10 secs
+//1000 loops == 19 secs
+//1500 loops == 25 secs
+
+
+int LOOPS = 500; // how many loops we want to go through, corresponding to motor spin time
+
+//EASY BUTTON XBEE
+    eButtonXBEE=Serial.read(); //xbeeSerial.read()
+    if (numOfZeros == 1 && eButtonXBEE != 0)
+    {
+      numOfZeros = 0;
     }
-       
+    else if (numOfZeros == 1 && eButtonXBEE == 0)
+    {
+      // two consecutive 0's, start motor
+      numOfLoops++; // numOfLoops brings you to motor code
+    }
+    else if (numOfZeros == 0 && eButtonXBEE == 0)
+    {
+      numOfZeros++;
+    }
+
+// start motor for loop time
+    if (numOfLoops == 1)
+    {
+        digitalWrite(RPWM, LOW); 
+        digitalWrite(LPWM, HIGH);
+        numOfLoops++;
+    }
+
+    if (numOfLoops > 1 && numOfLoops < LOOPS)
+    {
+        numOfLoops++;
+    }
+
+    if (numOfLoops == LOOPS)
+    {
+      numOfLoops = 0;
+      digitalWrite(RPWM, LOW); 
+      digitalWrite(LPWM, LOW);
+    }
+    
+  //  FlySky controller transmitting data
     if (ch8 >= 900 && ch8 <=1100) //switch on transmitter is upward position= FORWARD
     { 
         digitalWrite(RPWM, LOW); 
